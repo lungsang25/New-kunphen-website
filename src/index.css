@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 35 30% 96%;
+    --foreground: 350 30% 15%;
+
+    --card: 35 25% 93%;
+    --card-foreground: 350 30% 15%;
+
+    --popover: 35 30% 96%;
+    --popover-foreground: 350 30% 15%;
+
+    --primary: 350 55% 30%;
+    --primary-foreground: 40 30% 96%;
+
+    --secondary: 40 45% 88%;
+    --secondary-foreground: 350 40% 20%;
+
+    --muted: 35 20% 90%;
+    --muted-foreground: 350 15% 45%;
+
+    --accent: 40 75% 55%;
+    --accent-foreground: 350 40% 12%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 35 20% 85%;
+    --input: 35 20% 85%;
+    --ring: 350 55% 30%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 35 25% 93%;
+    --sidebar-foreground: 350 30% 15%;
+    --sidebar-primary: 350 55% 30%;
+    --sidebar-primary-foreground: 40 30% 96%;
+    --sidebar-accent: 40 45% 88%;
+    --sidebar-accent-foreground: 350 40% 20%;
+    --sidebar-border: 35 20% 85%;
+    --sidebar-ring: 350 55% 30%;
+
+    --gold: 40 75% 55%;
+    --gold-light: 40 60% 75%;
+    --maroon: 350 55% 30%;
+    --maroon-dark: 350 60% 20%;
+    --cream: 35 30% 96%;
+    --cream-dark: 35 25% 90%;
+    --warm-brown: 25 30% 35%;
+
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Source Sans 3', sans-serif;
+  }
+
+  .dark {
+    --background: 350 30% 8%;
+    --foreground: 35 30% 92%;
+    --card: 350 25% 12%;
+    --card-foreground: 35 30% 92%;
+    --popover: 350 30% 8%;
+    --popover-foreground: 35 30% 92%;
+    --primary: 40 75% 55%;
+    --primary-foreground: 350 40% 12%;
+    --secondary: 350 30% 18%;
+    --secondary-foreground: 35 30% 92%;
+    --muted: 350 20% 16%;
+    --muted-foreground: 35 15% 60%;
+    --accent: 40 60% 45%;
+    --accent-foreground: 35 30% 96%;
+    --border: 350 20% 20%;
+    --input: 350 20% 20%;
+    --ring: 40 75% 55%;
+    --sidebar-background: 350 25% 10%;
+    --sidebar-foreground: 35 30% 92%;
+    --sidebar-primary: 40 75% 55%;
+    --sidebar-primary-foreground: 350 40% 12%;
+    --sidebar-accent: 350 20% 16%;
+    --sidebar-accent-foreground: 35 30% 92%;
+    --sidebar-border: 350 20% 20%;
+    --sidebar-ring: 40 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .tibetan-divider {
+    @apply w-24 h-0.5 bg-accent mx-auto;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24 px-4;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      hsla(var(--maroon-dark), 0.4) 0%,
+      hsla(var(--maroon-dark), 0.6) 100%
+    );
+  }
+}
