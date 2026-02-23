@@ -71,3 +71,48 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## AI assistant setup (Tibetan medicine advisor)
+
+This project now includes a floating AI chat widget in the bottom-right corner and a secure backend endpoint at `POST /api/ai-chat`.
+
+### 1) Install dependencies
+
+```sh
+npm install
+```
+
+### 2) Configure environment
+
+```sh
+cp .env.example .env
+```
+
+Then set `OPENAI_API_KEY` in `.env`.
+
+### 3) Run frontend + AI backend
+
+In terminal 1:
+
+```sh
+npm run dev
+```
+
+In terminal 2:
+
+```sh
+npm run dev:ai
+```
+
+The Vite server proxies `/api/*` to the AI backend on port `8787`.
+
+### Model-side behavior
+
+The model behavior is controlled in `server/ai-chat-server.mjs` via a strict system prompt that enforces:
+
+- Tibetan medicine (Sowa Rigpa) domain expertise
+- Refusal for unrelated topics
+- No diagnosis replacement for in-person care
+- Escalation to emergency services for severe symptoms
+
+You can tune model choice with `OPENAI_MODEL` (default: `gpt-4o-mini`).

@@ -12,6 +12,7 @@ import Articles from "./pages/Articles";
 import Gallery from "./pages/Gallery";
 import Appointments from "./pages/Appointments";
 import NotFound from "./pages/NotFound";
+import AIAssistantChat from "./components/AIAssistantChat";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
+        <AIAssistantChat />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
