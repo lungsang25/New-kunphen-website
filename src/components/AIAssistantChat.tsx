@@ -74,7 +74,7 @@ const AIAssistantChat = () => {
                 {messages.map((message, index) => (
                   <div
                     key={`${message.role}-${index}`}
-                    className={`max-w-[85%] rounded-md px-3 py-2 text-sm leading-relaxed ${
+                    className={`w-fit max-w-[85%] rounded-md px-3 py-2 text-sm leading-relaxed ${
                       message.role === "user"
                         ? "ml-auto bg-primary text-primary-foreground"
                         : "bg-secondary text-secondary-foreground"
