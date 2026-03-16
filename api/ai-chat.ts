@@ -1,17 +1,7 @@
-import cors from "cors";
-import dotenv from "dotenv";
-import express from "express";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-dotenv.config();
-
-const app = express();
-const port = Number(process.env.AI_SERVER_PORT || 8787);
 const model = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
 const groqApiKey = process.env.GROQ_API_KEY;
-
-if (!groqApiKey) {
-  console.warn("Warning: GROQ_API_KEY not set. AI chat will not work.");
-}
 
 const systemPrompt = `
 You are "Kunphen Tibetan Medicine Assistant", a warm and knowledgeable guide for patients interested in Tibetan medicine (Sowa Rigpa).
@@ -31,14 +21,20 @@ Rules:
 5) When appropriate, gently suggest booking an appointment at Kunphen clinic.
 `;
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || true,
-  }),
-);
-app.use(express.json({ limit: "1mb" }));
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Handle CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-app.post("/api/ai-chat", async (req, res) => {
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
     const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
     const history = Array.isArray(req.body?.history) ? req.body.history : [];
@@ -48,9 +44,15 @@ app.post("/api/ai-chat", async (req, res) => {
     }
 
     const safeHistory = history
-      .filter((item) => item && (item.role === "user" || item.role === "assistant") && typeof item.content === "string")
+      .filter(
+        (item: { role?: string; content?: string }) =>
+          item && (item.role === "user" || item.role === "assistant") && typeof item.content === "string"
+      )
       .slice(-12)
-      .map((item) => ({ role: item.role, content: item.content.slice(0, 1000) }));
+      .map((item: { role: string; content: string }) => ({
+        role: item.role,
+        content: item.content.slice(0, 1000),
+      }));
 
     if (!groqApiKey) {
       return res.status(500).json({ error: "AI service not configured." });
@@ -60,7 +62,7 @@ app.post("/api/ai-chat", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${groqApiKey}`,
+        Authorization: `Bearer ${groqApiKey}`,
       },
       body: JSON.stringify({
         model,
@@ -82,6 +84,7 @@ app.post("/api/ai-chat", async (req, res) => {
 
     const completion = await groqResponse.json();
     const reply = completion.choices?.[0]?.message?.content?.trim();
+
     if (!reply) {
       return res.status(500).json({ error: "Empty model response." });
     }
@@ -91,8 +94,4 @@ app.post("/api/ai-chat", async (req, res) => {
     console.error("AI chat error:", error);
     return res.status(500).json({ error: "Failed to get AI response." });
   }
-});
-
-app.listen(port, () => {
-  console.log(`AI chat server running at http://localhost:${port}`);
-});
+}
