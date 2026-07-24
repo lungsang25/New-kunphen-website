@@ -58,7 +58,7 @@ const AIAssistantChat = () => {
     <div className="fixed bottom-4 right-4 z-50">
       {open ? (
         <Card className="w-[22rem] sm:w-[24rem] shadow-xl border-border">
-          <CardHeader className="pb-3">
+          <CardHeader className="py-1.5">
             <div className="flex items-center justify-between gap-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Bot className="h-5 w-5 text-accent" />
@@ -68,13 +68,10 @@ const AIAssistantChat = () => {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Informational support only. For diagnosis or urgent issues, consult a qualified doctor.
-            </p>
           </CardHeader>
 
           <CardContent className="space-y-3">
-            <ScrollArea className="h-72 rounded-md border p-3 bg-background/70">
+            <ScrollArea className="h-96 rounded-md border p-3 bg-background/70">
               <div className="space-y-3">
                 {messages.map((message, index) => (
                   <div
