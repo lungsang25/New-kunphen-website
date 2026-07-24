@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CalendarDays, Pill, BookOpen, Heart, Leaf, Shield } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
+import SEO from "@/components/SEO";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -12,8 +13,14 @@ const fadeUp = {
 
 const Index = () => {
   return (
-    <main>
-      <HeroSlider />
+    <>
+      <SEO 
+        title="Kunphen Hospital - Tibetan Medicine & Sowa Rigpa Healing Center"
+        description="Kunphen Tibetan Medicine Hospital offers authentic Sowa Rigpa treatments, herbal medicines, pulse diagnosis, and holistic healing. Book appointments with experienced Tibetan medicine practitioners."
+        keywords="Kunphen Hospital, Tibetan Medicine, Sowa Rigpa, Traditional Tibetan Medicine, Herbal Medicine, Pulse Diagnosis, Holistic Healing, Alternative Medicine, Natural Remedies, Tibetan Doctors"
+      />
+      <main>
+        <HeroSlider />
 
       {/* Quick Actions */}
       <section className="relative -mt-16 z-10 container mx-auto px-4">
@@ -112,6 +119,7 @@ const Index = () => {
         </div>
       </section>
     </main>
+    </>
   );
 };
 

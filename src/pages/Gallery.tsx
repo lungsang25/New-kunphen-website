@@ -9,6 +9,7 @@ import hero5 from "@/assets/hero-5.jpg";
 import doctor1 from "@/assets/doctor-1.jpg";
 import doctor2 from "@/assets/doctor-2.jpg";
 import doctor3 from "@/assets/doctor-3.jpg";
+import SEO from "@/components/SEO";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -37,7 +38,13 @@ const Gallery = () => {
   };
 
   return (
-    <main className="pt-20">
+    <>
+      <SEO 
+        title="Gallery - Kunphen Hospital Facilities & Traditional Medicine Photos"
+        description="View photos of Kunphen Tibetan Medicine Hospital, our practitioners, herbal medicine preparations, facilities, and traditional healing practices."
+        keywords="Kunphen gallery, Tibetan medicine photos, hospital facilities, traditional medicine images, herbal preparation, Kunphen hospital photos"
+      />
+      <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-6xl">
           <motion.div {...fadeUp} className="text-center mb-12">
@@ -122,6 +129,7 @@ const Gallery = () => {
         )}
       </AnimatePresence>
     </main>
+    </>
   );
 };
 

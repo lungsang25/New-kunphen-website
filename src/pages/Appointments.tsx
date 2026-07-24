@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
+import SEO from "@/components/SEO";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -31,6 +32,12 @@ const Appointments = () => {
   };
 
   return (
+    <>
+      <SEO 
+        title="Book Appointment - Kunphen Hospital Tibetan Medicine Consultation"
+        description="Schedule your consultation with expert Tibetan medicine practitioners at Kunphen Hospital. Book appointments for pulse diagnosis, herbal medicine treatment, and holistic wellness care."
+        keywords="book appointment Kunphen, Tibetan medicine consultation, schedule appointment, pulse diagnosis booking, herbal medicine appointment, holistic health consultation"
+      />
     <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-6xl">
@@ -182,6 +189,7 @@ const Appointments = () => {
         </div>
       </section>
     </main>
+    </>
   );
 };
 

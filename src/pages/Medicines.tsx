@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Phone, ShoppingBag, X } from "lucide-react";
 import hero2 from "@/assets/hero-2.jpg";
 import hero4 from "@/assets/hero-4.jpg";
+import SEO from "@/components/SEO";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -64,6 +65,12 @@ const Medicines = () => {
   const [selected, setSelected] = useState<Medicine | null>(null);
 
   return (
+    <>
+      <SEO 
+        title="Tibetan Herbal Medicines - Kunphen Hospital Traditional Remedies"
+        description="Explore authentic Tibetan herbal medicines at Kunphen Hospital. Discover traditional remedies like Agar-35, Rinchen Ratna Sampel, and other natural formulations for holistic healing and wellness."
+        keywords="Tibetan herbal medicine, Agar-35, Rinchen Ratna Sampel, traditional remedies, Himalayan herbs, natural medicine, Tibetan pills, herbal formulations, Kunphen medicines"
+      />
     <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-5xl">
@@ -178,6 +185,7 @@ const Medicines = () => {
         )}
       </AnimatePresence>
     </main>
+    </>
   );
 };
 

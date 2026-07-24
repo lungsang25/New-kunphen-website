@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import SEO from "@/components/SEO";
 
 const DESCRIPTION_TRUNCATE_LENGTH = 180;
 
@@ -143,7 +144,13 @@ function PractitionerCard({
 
 const About = () => {
   return (
-    <main className="pt-20">
+    <>
+      <SEO 
+        title="About Kunphen Hospital - Expert Tibetan Medicine Practitioners"
+        description="Meet our experienced Tibetan medicine doctors and practitioners at Kunphen Hospital. Learn about our founder Dr. Kunsang Phenthok and our team of expert healers specializing in Sowa Rigpa and traditional Tibetan medicine."
+        keywords="Kunphen doctors, Tibetan medicine practitioners, Dr. Kunsang Phenthok, Sowa Rigpa healers, traditional medicine experts, Tibetan physicians, holistic healers"
+      />
+      <main className="pt-20">
       {/* Hero */}
       <section className="section-padding bg-card">
         <div className="container mx-auto max-w-4xl text-center">
@@ -232,6 +239,7 @@ const About = () => {
         </div>
       </section>
     </main>
+    </>
   );
 };
 

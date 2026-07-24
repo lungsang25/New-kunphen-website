@@ -5,6 +5,7 @@ import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
 import hero5 from "@/assets/hero-5.jpg";
+import SEO from "@/components/SEO";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -61,7 +62,13 @@ const Articles = () => {
   });
 
   return (
-    <main className="pt-20">
+    <>
+      <SEO 
+        title="Tibetan Medicine Articles & Blog - Kunphen Hospital Wellness Resources"
+        description="Read informative articles about Tibetan medicine, Sowa Rigpa philosophy, herbal remedies, and holistic wellness from Kunphen Hospital's expert practitioners."
+        keywords="Tibetan medicine articles, Sowa Rigpa blog, herbal medicine information, holistic wellness articles, traditional medicine resources, Kunphen blog"
+      />
+      <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-5xl">
           <motion.div {...fadeUp} className="text-center mb-12">
@@ -143,6 +150,7 @@ const Articles = () => {
         </div>
       </section>
     </main>
+    </>
   );
 };
 
