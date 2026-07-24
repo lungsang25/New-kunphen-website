@@ -67,9 +67,9 @@ const Medicines = () => {
   return (
     <>
       <SEO 
-        title="Tibetan Herbal Medicines - Kunphen Hospital Traditional Remedies"
-        description="Explore authentic Tibetan herbal medicines at Kunphen Hospital. Discover traditional remedies like Agar-35, Rinchen Ratna Sampel, and other natural formulations for holistic healing and wellness."
-        keywords="Tibetan herbal medicine, Agar-35, Rinchen Ratna Sampel, traditional remedies, Himalayan herbs, natural medicine, Tibetan pills, herbal formulations, Kunphen medicines"
+        title="Tibetan Herbal Medicines Kathmandu Nepal - Kunphen Herbal Clinic"
+        description="Explore authentic Tibetan herbal medicines at Kunphen Herbal Clinic in Kathmandu, Nepal. Discover traditional remedies like Agar-35, Rinchen Ratna Sampel at Kunphen Medical Center. Natural formulations for holistic healing in Nepal."
+        keywords="Tibetan herbal medicine Kathmandu, Tibetan herbal medicine Nepal, Agar-35 Kathmandu, Kunphen Herbal Clinic Nepal, traditional remedies Kathmandu, Himalayan herbs Nepal, natural medicine Kathmandu, Tibetan pills Nepal, herbal formulations Kathmandu, Kunphen medicines Nepal"
       />
     <main className="pt-20">
       <section className="section-padding">

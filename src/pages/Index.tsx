@@ -15,9 +15,9 @@ const Index = () => {
   return (
     <>
       <SEO 
-        title="Kunphen Hospital - Tibetan Medicine & Sowa Rigpa Healing Center"
-        description="Kunphen Tibetan Medicine Hospital offers authentic Sowa Rigpa treatments, herbal medicines, pulse diagnosis, and holistic healing. Book appointments with experienced Tibetan medicine practitioners."
-        keywords="Kunphen Hospital, Tibetan Medicine, Sowa Rigpa, Traditional Tibetan Medicine, Herbal Medicine, Pulse Diagnosis, Holistic Healing, Alternative Medicine, Natural Remedies, Tibetan Doctors"
+        title="Kunphen Hospital Kathmandu Nepal - Tibetan Medicine & Herbal Clinic"
+        description="Kunphen Hospital in Kathmandu, Nepal - Leading Tibetan Medicine Hospital and Herbal Clinic. Kunphen Medical Center offers authentic Sowa Rigpa treatments, herbal medicines, pulse diagnosis in Kathmandu. Book appointments with experienced Tibetan medicine practitioners in Nepal."
+        keywords="Kunphen Hospital Kathmandu, Kunphen Hospital Nepal, Kunphen Medical Center Kathmandu, Kunphen Herbal Clinic Nepal, Tibetan Medicine Kathmandu, Tibetan Medicine Nepal, Kunphen Kathmandu, Kunphen Nepal, Sowa Rigpa Kathmandu, Traditional Tibetan Medicine Nepal, Herbal Medicine Kathmandu, Pulse Diagnosis Nepal, Holistic Healing Kathmandu, Alternative Medicine Nepal, Tibetan Doctors Kathmandu"
       />
       <main>
         <HeroSlider />

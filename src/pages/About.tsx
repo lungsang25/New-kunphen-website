@@ -146,9 +146,9 @@ const About = () => {
   return (
     <>
       <SEO 
-        title="About Kunphen Hospital - Expert Tibetan Medicine Practitioners"
-        description="Meet our experienced Tibetan medicine doctors and practitioners at Kunphen Hospital. Learn about our founder Dr. Kunsang Phenthok and our team of expert healers specializing in Sowa Rigpa and traditional Tibetan medicine."
-        keywords="Kunphen doctors, Tibetan medicine practitioners, Dr. Kunsang Phenthok, Sowa Rigpa healers, traditional medicine experts, Tibetan physicians, holistic healers"
+        title="About Kunphen Hospital Kathmandu Nepal - Expert Tibetan Medicine Practitioners"
+        description="Meet our experienced Tibetan medicine doctors at Kunphen Hospital in Kathmandu, Nepal. Learn about our founder Dr. Kunsang Phenthok and our team of expert healers at Kunphen Medical Center specializing in Sowa Rigpa and traditional Tibetan medicine in Nepal."
+        keywords="Kunphen doctors Kathmandu, Tibetan medicine practitioners Nepal, Dr. Kunsang Phenthok, Sowa Rigpa healers Kathmandu, traditional medicine experts Nepal, Tibetan physicians Kathmandu, holistic healers Nepal, Kunphen Medical Center doctors"
       />
       <main className="pt-20">
       {/* Hero */}

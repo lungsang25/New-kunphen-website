@@ -34,9 +34,9 @@ const Appointments = () => {
   return (
     <>
       <SEO 
-        title="Book Appointment - Kunphen Hospital Tibetan Medicine Consultation"
-        description="Schedule your consultation with expert Tibetan medicine practitioners at Kunphen Hospital. Book appointments for pulse diagnosis, herbal medicine treatment, and holistic wellness care."
-        keywords="book appointment Kunphen, Tibetan medicine consultation, schedule appointment, pulse diagnosis booking, herbal medicine appointment, holistic health consultation"
+        title="Book Appointment Kathmandu Nepal - Kunphen Hospital Tibetan Medicine"
+        description="Schedule your consultation at Kunphen Hospital in Kathmandu, Nepal. Book appointments with expert Tibetan medicine practitioners at Kunphen Medical Center for pulse diagnosis, herbal medicine treatment, and holistic wellness care in Kathmandu."
+        keywords="book appointment Kunphen Kathmandu, book appointment Kunphen Nepal, Tibetan medicine consultation Kathmandu, schedule appointment Nepal, pulse diagnosis booking Kathmandu, herbal medicine appointment Nepal, holistic health consultation Kathmandu, Kunphen Medical Center appointment"
       />
     <main className="pt-20">
       <section className="section-padding">
