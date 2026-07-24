@@ -51,7 +51,7 @@ const Footer = () => {
               </a>
               <div className="flex items-start gap-2 text-primary-foreground/70">
                 <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>123 Himalayan Way, Dharamsala, Himachal Pradesh, India</span>
+                <span>Kunphen Marg, Kathmandu 44600, Nepal</span>
               </div>
             </div>
           </div>

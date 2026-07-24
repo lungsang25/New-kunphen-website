@@ -160,10 +160,10 @@ const Appointments = () => {
               {/* Contact Info */}
               <div className="space-y-4">
                 {[
-                  { icon: MapPin, label: "Kunphen Tibetan Medical Centre, Chhetrapati, Kathmandu, Nepal" },
+                  { icon: MapPin, label: "Kunphen Marg, Kathmandu 44600, Nepal" },
                   { icon: Phone, label: "+977 1-5351920", href: "tel:+97715351920" },
                   { icon: Mail, label: "info@kunphen.com", href: "mailto:info@kunphen.com" },
-                  { icon: Clock, label: "Mon – Sat: 9:00 AM – 5:00 PM" },
+                  { icon: Clock, label: "Mon – Sun: 9:00 AM – 5:00 PM (Sat Closed)" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-3">
                     <item.icon className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />

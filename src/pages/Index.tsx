@@ -44,7 +44,7 @@ const Index = () => {
       <section className="section-padding">
         <div className="container mx-auto max-w-4xl text-center">
           <motion.div {...fadeUp}>
-            <p className="text-accent font-display text-lg mb-2">སྨན་ཁང་ཀུན་ཕན།</p>
+            <p className="text-accent font-display text-lg mb-2">ཀུན་ཕན་སྨན་ཁང་།</p>
             <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
               Welcome to Kunphen
             </h2>
