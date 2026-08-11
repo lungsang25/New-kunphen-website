@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Images } from "lucide-react";
 import SEO from "@/components/SEO";
 import { api } from "@/lib/api";
 
@@ -12,21 +12,59 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
+interface LightboxState {
+  album: number;
+  image: number;
+}
+
 const Gallery = () => {
-  const [lightbox, setLightbox] = useState<number | null>(null);
-  const { data: images = [], isLoading, isError } = useQuery({
+  const [lightbox, setLightbox] = useState<LightboxState | null>(null);
+  const { data: albums = [], isLoading, isError } = useQuery({
     queryKey: ["gallery"],
     queryFn: api.gallery,
   });
 
-  const navigate = (dir: number) => {
-    if (lightbox === null) return;
-    setLightbox((lightbox + dir + images.length) % images.length);
-  };
+  const openAlbum = albums[lightbox?.album ?? -1];
+  // A refetch can shrink the data while the viewer is open, so never index blindly.
+  const openImage = openAlbum?.images[lightbox?.image ?? -1];
+  const isOpen = openImage !== undefined;
+
+  const navigate = useCallback(
+    (dir: number) => {
+      setLightbox((prev) => {
+        if (prev === null) return prev;
+        const count = albums[prev.album]?.images.length ?? 0;
+        if (count === 0) return null;
+        return { ...prev, image: (prev.image + dir + count) % count };
+      });
+    },
+    [albums]
+  );
+
+  const close = useCallback(() => setLightbox(null), []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") navigate(-1);
+      else if (e.key === "ArrowRight") navigate(1);
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen, close, navigate]);
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Gallery - Kunphen Hospital Facilities & Traditional Medicine Photos"
         description="View photos of Kunphen Tibetan Medicine Hospital, our practitioners, herbal medicine preparations, facilities, and traditional healing practices."
         keywords="Kunphen gallery, Tibetan medicine photos, hospital facilities, traditional medicine images, herbal preparation, Kunphen hospital photos"
@@ -52,73 +90,184 @@ const Gallery = () => {
           )}
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {images.map((img, i) => (
-              <motion.div
-                key={img.id}
-                {...fadeUp}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                onClick={() => setLightbox(i)}
-                className="cursor-pointer aspect-square overflow-hidden rounded-lg group"
-              >
-                <img
-                  src={img.image_url}
-                  alt={img.caption}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-              </motion.div>
-            ))}
+            {albums.map((album, i) => {
+              const cover = album.images[0];
+              const count = album.images.length;
+              if (!cover) return null;
+
+              return (
+                <motion.button
+                  key={album.id}
+                  type="button"
+                  {...fadeUp}
+                  transition={{ duration: 0.5, delay: i * 0.05 }}
+                  onClick={() => setLightbox({ album: i, image: 0 })}
+                  aria-label={
+                    count > 1
+                      ? `${album.title || "Album"} — ${count} photos`
+                      : album.title || "Photo"
+                  }
+                  className="relative block w-full text-left pt-2 group"
+                >
+                  {/* Offset card edges peeking out behind the cover, so an album reads
+                      as a set of photos rather than a single one. */}
+                  {count > 1 && (
+                    <>
+                      <span
+                        aria-hidden
+                        className="absolute inset-x-4 top-0 h-2 rounded-t-md bg-card/70 border border-b-0 border-border"
+                      />
+                      <span
+                        aria-hidden
+                        className="absolute inset-x-2 top-1 h-2 rounded-t-md bg-card border border-b-0 border-border"
+                      />
+                    </>
+                  )}
+
+                  <div className="relative aspect-square overflow-hidden rounded-lg">
+                    <img
+                      src={cover.image_url}
+                      alt={album.title || cover.caption}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+
+                    {album.title && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-foreground/80 to-transparent pt-8 px-3 pb-2.5">
+                        <p className="text-primary-foreground text-sm font-medium line-clamp-2">
+                          {album.title}
+                        </p>
+                      </div>
+                    )}
+
+                    {count > 1 && (
+                      <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-foreground/70 backdrop-blur-sm px-2 py-1 text-xs font-medium text-primary-foreground">
+                        <Images className="w-3 h-3" />
+                        {count}
+                      </span>
+                    )}
+                  </div>
+                </motion.button>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Lightbox */}
       <AnimatePresence>
-        {lightbox !== null && (
+        {isOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-foreground/90 flex items-center justify-center p-4"
-            onClick={() => setLightbox(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={openAlbum.title || "Gallery image"}
+            className="fixed inset-0 z-[60] bg-foreground/95 overflow-y-auto"
+            onClick={close}
           >
             <button
-              onClick={() => setLightbox(null)}
+              onClick={close}
               className="absolute top-4 right-4 text-primary-foreground/80 hover:text-primary-foreground z-10"
               aria-label="Close"
             >
               <X className="w-8 h-8" />
             </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); navigate(-1); }}
-              className="absolute left-4 text-primary-foreground/80 hover:text-primary-foreground z-10"
-              aria-label="Previous"
-            >
-              <ChevronLeft className="w-10 h-10" />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); navigate(1); }}
-              className="absolute right-4 text-primary-foreground/80 hover:text-primary-foreground z-10"
-              aria-label="Next"
-            >
-              <ChevronRight className="w-10 h-10" />
-            </button>
-            <motion.div
-              key={lightbox}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+
+            <div
+              className="min-h-full mx-auto max-w-7xl flex flex-col lg:flex-row lg:items-center gap-6 p-4 pt-16 lg:p-8"
               onClick={(e) => e.stopPropagation()}
-              className="max-w-4xl w-full"
             >
-              <img
-                src={images[lightbox].image_url}
-                alt={images[lightbox].caption}
-                className="w-full max-h-[75vh] object-contain rounded-lg"
-              />
-              <p className="text-center text-primary-foreground/70 text-sm mt-4 font-body">
-                {images[lightbox].caption}
-              </p>
-            </motion.div>
+              {/* Image pane */}
+              <div className="relative flex-1 flex items-center justify-center min-w-0">
+                {openAlbum.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => navigate(-1)}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 bg-background/20 backdrop-blur-sm hover:bg-background/40 text-primary-foreground transition-colors"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
+                    </button>
+                    <button
+                      onClick={() => navigate(1)}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 bg-background/20 backdrop-blur-sm hover:bg-background/40 text-primary-foreground transition-colors"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
+                    </button>
+                  </>
+                )}
+
+                <motion.img
+                  key={`${openAlbum.id}-${lightbox.image}`}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.25 }}
+                  src={openImage.image_url}
+                  alt={openImage.caption || openAlbum.title}
+                  className="max-w-full max-h-[55vh] lg:max-h-[85vh] w-auto object-contain rounded-lg"
+                />
+              </div>
+
+              {/* Caption panel */}
+              <aside className="w-full lg:w-80 xl:w-96 shrink-0 text-primary-foreground">
+                {openAlbum.title && (
+                  <h2 className="font-display text-2xl md:text-3xl font-bold">
+                    {openAlbum.title}
+                  </h2>
+                )}
+                <div className="tibetan-divider !mx-0 my-4" />
+
+                {openImage.caption ? (
+                  <p className="font-body text-primary-foreground/80 leading-relaxed">
+                    {openImage.caption}
+                  </p>
+                ) : (
+                  <p className="font-body text-primary-foreground/40 italic text-sm">
+                    No caption for this photo.
+                  </p>
+                )}
+
+                {openAlbum.images.length > 1 && (
+                  <>
+                    <p className="mt-6 text-sm text-primary-foreground/60">
+                      {lightbox.image + 1} / {openAlbum.images.length}
+                    </p>
+
+                    <div className="mt-3 flex gap-2 overflow-x-auto pb-2 lg:flex-wrap lg:overflow-visible">
+                      {openAlbum.images.map((img, index) => (
+                        <button
+                          key={img.id}
+                          onClick={() =>
+                            setLightbox((prev) =>
+                              prev === null ? prev : { ...prev, image: index }
+                            )
+                          }
+                          aria-label={`View image ${index + 1}`}
+                          aria-current={index === lightbox.image}
+                          className={`shrink-0 w-14 h-14 rounded-md overflow-hidden transition-opacity ${
+                            index === lightbox.image
+                              ? "ring-2 ring-accent"
+                              : "opacity-50 hover:opacity-100"
+                          }`}
+                        >
+                          <img
+                            src={img.image_url}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </aside>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

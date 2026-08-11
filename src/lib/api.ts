@@ -28,12 +28,21 @@ export interface Article extends ArticleListItem {
   updated_at: string;
 }
 
-export interface GalleryImage {
+export interface GalleryAlbumImage {
   id: number;
   image_url: string;
   caption: string;
   sort_order: number;
+}
+
+export interface GalleryAlbum {
+  id: number;
+  title: string;
+  sort_order: number;
+  /** Ordered; the first image is the album cover. Never empty. */
+  images: GalleryAlbumImage[];
   created_at: string;
+  updated_at: string;
 }
 
 async function get<T>(path: string): Promise<T> {
@@ -48,5 +57,5 @@ export const api = {
   medicines: () => get<Medicine[]>("/api/medicines"),
   articles: () => get<ArticleListItem[]>("/api/articles"),
   article: (slug: string) => get<Article>(`/api/articles/${slug}`),
-  gallery: () => get<GalleryImage[]>("/api/gallery"),
+  gallery: () => get<GalleryAlbum[]>("/api/gallery"),
 };
