@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import Medicines from "./pages/Medicines";
 import Articles from "./pages/Articles";
+import ArticleDetail from "./pages/ArticleDetail";
 import Gallery from "./pages/Gallery";
 import Appointments from "./pages/Appointments";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/medicines" element={<Medicines />} />
           <Route path="/articles" element={<Articles />} />
+          <Route path="/articles/:slug" element={<ArticleDetail />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="*" element={<NotFound />} />

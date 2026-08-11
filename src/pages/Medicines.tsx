@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, ShoppingBag, X } from "lucide-react";
-import hero2 from "@/assets/hero-2.jpg";
-import hero4 from "@/assets/hero-4.jpg";
 import SEO from "@/components/SEO";
+import { api, type Medicine } from "@/lib/api";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -12,57 +12,12 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-interface Medicine {
-  id: number;
-  name: string;
-  tibetan: string;
-  description: string;
-  fullDescription: string;
-  image: string;
-  uses: string[];
-}
-
-const medicines: Medicine[] = [
-  {
-    id: 1,
-    name: "Agar-35",
-    tibetan: "ཨ་གར་སོ་ལྔ།",
-    description: "A calming formula for stress, anxiety, and nervous system balance.",
-    fullDescription: "Agar-35 is one of the most renowned Tibetan formulations, composed of 35 carefully selected ingredients including aquilaria, clove, and saffron. It is traditionally used to pacify wind (rLung) imbalances manifesting as anxiety, insomnia, and heart palpitations.",
-    image: hero4,
-    uses: ["Anxiety & Stress Relief", "Insomnia", "Heart Palpitations", "Nervous System Support"],
-  },
-  {
-    id: 2,
-    name: "Ratna Samphel",
-    tibetan: "རིན་ཆེན་བསམ་འཕེལ།",
-    description: "A precious pill for detoxification and immune system strengthening.",
-    fullDescription: "Ratna Samphel, or 'Precious Wish-fulfilling Jewel,' is a revered compound pill containing processed precious metals and rare herbs. Used for deep-level detoxification and rejuvenation of the body's vital energies.",
-    image: hero2,
-    uses: ["Detoxification", "Immune Boosting", "Chronic Fatigue", "Overall Rejuvenation"],
-  },
-  {
-    id: 3,
-    name: "Manu-4",
-    tibetan: "མ་ནུ་བཞི་ཐང་།",
-    description: "A digestive formula for balancing stomach heat and acidity.",
-    fullDescription: "Manu-4 is a classic four-ingredient digestive formula combining pomegranate, long pepper, cinnamon, and cardamom. It is used to restore digestive fire (me-drod) and treat conditions related to bile (mKhris-pa) imbalances.",
-    image: hero4,
-    uses: ["Digestive Issues", "Acid Reflux", "Appetite Regulation", "Stomach Balance"],
-  },
-  {
-    id: 4,
-    name: "Dashel Dutsi",
-    tibetan: "བདེ་གཤེལ་བདུད་རྩི།",
-    description: "A warming remedy for joint pain and cold-related conditions.",
-    fullDescription: "Dashel Dutsi, the 'Nectar of Comfort,' combines warming herbs and minerals to address pain stemming from cold and damp conditions. Particularly effective for arthritis, rheumatism, and cold-type kidney disorders.",
-    image: hero2,
-    uses: ["Joint Pain", "Arthritis", "Cold Constitution", "Kidney Health"],
-  },
-];
-
 const Medicines = () => {
   const [selected, setSelected] = useState<Medicine | null>(null);
+  const { data: medicines = [], isLoading, isError } = useQuery({
+    queryKey: ["medicines"],
+    queryFn: api.medicines,
+  });
 
   return (
     <>
@@ -85,6 +40,16 @@ const Medicines = () => {
             </p>
           </motion.div>
 
+          {isLoading && (
+            <p className="text-center text-muted-foreground">Loading medicines…</p>
+          )}
+          {isError && (
+            <p className="text-center text-muted-foreground">Unable to load medicines right now.</p>
+          )}
+          {!isLoading && !isError && medicines.length === 0 && (
+            <p className="text-center text-muted-foreground">No medicines available yet.</p>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {medicines.map((med, i) => (
               <motion.div
@@ -96,13 +61,13 @@ const Medicines = () => {
               >
                 <div className="aspect-video overflow-hidden">
                   <img
-                    src={med.image}
+                    src={med.image_url}
                     alt={med.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-6">
-                  <p className="text-accent text-xs mb-1 font-body">{med.tibetan}</p>
+                  <p className="text-accent text-xs mb-1 font-body">{med.tibetan_name}</p>
                   <h3 className="font-display text-xl font-semibold text-foreground mb-2">
                     {med.name}
                   </h3>
@@ -133,7 +98,7 @@ const Medicines = () => {
             >
               <div className="relative">
                 <img
-                  src={selected.image}
+                  src={selected.image_url}
                   alt={selected.name}
                   className="w-full aspect-video object-cover rounded-t-lg"
                 />
@@ -146,12 +111,12 @@ const Medicines = () => {
                 </button>
               </div>
               <div className="p-6">
-                <p className="text-accent text-sm mb-1">{selected.tibetan}</p>
+                <p className="text-accent text-sm mb-1">{selected.tibetan_name}</p>
                 <h2 className="font-display text-2xl font-bold text-foreground mb-3">
                   {selected.name}
                 </h2>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {selected.fullDescription}
+                  {selected.full_description}
                 </p>
                 <div className="mb-6">
                   <h4 className="font-display text-sm font-semibold text-foreground mb-2">Common Uses:</h4>

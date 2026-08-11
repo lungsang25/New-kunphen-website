@@ -1,11 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-import hero1 from "@/assets/hero-1.jpg";
-import hero2 from "@/assets/hero-2.jpg";
-import hero3 from "@/assets/hero-3.jpg";
-import hero5 from "@/assets/hero-5.jpg";
 import SEO from "@/components/SEO";
+import { api } from "@/lib/api";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -16,44 +15,20 @@ const fadeUp = {
 
 const categories = ["All", "Wellness", "Herbal Medicine", "Philosophy", "Treatments"];
 
-const articles = [
-  {
-    id: 1,
-    title: "Understanding the Three Humors in Tibetan Medicine",
-    category: "Philosophy",
-    date: "January 15, 2026",
-    excerpt: "Explore the foundational concept of rLung, mKhris-pa, and Bad-kan — the three nyepa that govern all physiological and psychological functions.",
-    image: hero1,
-  },
-  {
-    id: 2,
-    title: "The Healing Power of Himalayan Herbs",
-    category: "Herbal Medicine",
-    date: "January 8, 2026",
-    excerpt: "A deep dive into the rare medicinal plants found in the Himalayas and their therapeutic applications in traditional Tibetan formulations.",
-    image: hero2,
-  },
-  {
-    id: 3,
-    title: "Pulse Diagnosis: Reading the Body's Rhythms",
-    category: "Treatments",
-    date: "December 28, 2025",
-    excerpt: "Learn how Tibetan physicians use subtle pulse readings at the radial artery to diagnose imbalances and guide treatment plans.",
-    image: hero3,
-  },
-  {
-    id: 4,
-    title: "Seasonal Living According to Sowa Rigpa",
-    category: "Wellness",
-    date: "December 15, 2025",
-    excerpt: "Tibetan medicine emphasizes living in harmony with the seasons. Discover dietary and lifestyle recommendations for each time of year.",
-    image: hero5,
-  },
-];
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
 const Articles = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const { data: articles = [], isLoading, isError } = useQuery({
+    queryKey: ["articles"],
+    queryFn: api.articles,
+  });
 
   const filtered = articles.filter((a) => {
     const matchCategory = activeCategory === "All" || a.category === activeCategory;
@@ -110,6 +85,13 @@ const Articles = () => {
             </div>
           </div>
 
+          {isLoading && (
+            <p className="text-center text-muted-foreground">Loading articles…</p>
+          )}
+          {isError && (
+            <p className="text-center text-muted-foreground">Unable to load articles right now.</p>
+          )}
+
           {/* Articles Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filtered.map((article, i) => (
@@ -119,32 +101,34 @@ const Articles = () => {
                 transition={{ duration: 0.6, delay: i * 0.1 }}
                 className="bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow group cursor-pointer"
               >
-                <div className="aspect-video overflow-hidden">
-                  <img
-                    src={article.image}
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="bg-accent/15 text-accent text-xs px-2.5 py-0.5 rounded-full font-medium">
-                      {article.category}
-                    </span>
-                    <span className="text-muted-foreground text-xs">{article.date}</span>
+                <Link to={`/articles/${article.slug}`}>
+                  <div className="aspect-video overflow-hidden">
+                    <img
+                      src={article.image_url}
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
-                  <h3 className="font-display text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {article.excerpt}
-                  </p>
-                </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="bg-accent/15 text-accent text-xs px-2.5 py-0.5 rounded-full font-medium">
+                        {article.category}
+                      </span>
+                      <span className="text-muted-foreground text-xs">{formatDate(article.published_at)}</span>
+                    </div>
+                    <h3 className="font-display text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {article.excerpt}
+                    </p>
+                  </div>
+                </Link>
               </motion.article>
             ))}
           </div>
 
-          {filtered.length === 0 && (
+          {!isLoading && !isError && filtered.length === 0 && (
             <p className="text-center text-muted-foreground mt-12">No articles found matching your search.</p>
           )}
         </div>

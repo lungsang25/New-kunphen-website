@@ -1,15 +1,9 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import hero1 from "@/assets/hero-1.jpg";
-import hero2 from "@/assets/hero-2.jpg";
-import hero3 from "@/assets/hero-3.jpg";
-import hero4 from "@/assets/hero-4.jpg";
-import hero5 from "@/assets/hero-5.jpg";
-import doctor1 from "@/assets/doctor-1.jpg";
-import doctor2 from "@/assets/doctor-2.jpg";
-import doctor3 from "@/assets/doctor-3.jpg";
 import SEO from "@/components/SEO";
+import { api } from "@/lib/api";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -18,19 +12,12 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
-const images = [
-  { src: hero1, caption: "Morning prayers at the monastery" },
-  { src: hero2, caption: "Traditional herb preparation" },
-  { src: hero3, caption: "Consultation with Dr. Dorje" },
-  { src: hero4, caption: "Tibetan medicine formulations" },
-  { src: hero5, caption: "Medicinal herb garden" },
-  { src: doctor1, caption: "Community health camp" },
-  { src: doctor2, caption: "Patient wellness seminar" },
-  { src: doctor3, caption: "Research laboratory" },
-];
-
 const Gallery = () => {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const { data: images = [], isLoading, isError } = useQuery({
+    queryKey: ["gallery"],
+    queryFn: api.gallery,
+  });
 
   const navigate = (dir: number) => {
     if (lightbox === null) return;
@@ -57,17 +44,24 @@ const Gallery = () => {
             </p>
           </motion.div>
 
+          {isLoading && (
+            <p className="text-center text-muted-foreground">Loading gallery…</p>
+          )}
+          {isError && (
+            <p className="text-center text-muted-foreground">Unable to load gallery right now.</p>
+          )}
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {images.map((img, i) => (
               <motion.div
-                key={i}
+                key={img.id}
                 {...fadeUp}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
                 onClick={() => setLightbox(i)}
                 className="cursor-pointer aspect-square overflow-hidden rounded-lg group"
               >
                 <img
-                  src={img.src}
+                  src={img.image_url}
                   alt={img.caption}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
@@ -117,7 +111,7 @@ const Gallery = () => {
               className="max-w-4xl w-full"
             >
               <img
-                src={images[lightbox].src}
+                src={images[lightbox].image_url}
                 alt={images[lightbox].caption}
                 className="w-full max-h-[75vh] object-contain rounded-lg"
               />

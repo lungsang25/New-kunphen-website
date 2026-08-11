@@ -1,0 +1,52 @@
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+
+export interface Medicine {
+  id: number;
+  name: string;
+  tibetan_name: string;
+  description: string;
+  full_description: string;
+  image_url: string;
+  uses: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArticleListItem {
+  id: number;
+  title: string;
+  slug: string;
+  category: string;
+  excerpt: string;
+  image_url: string;
+  published_at: string;
+}
+
+export interface Article extends ArticleListItem {
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GalleryImage {
+  id: number;
+  image_url: string;
+  caption: string;
+  sort_order: number;
+  created_at: string;
+}
+
+async function get<T>(path: string): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`);
+  if (!res.ok) {
+    throw new Error(`API error ${res.status}: ${path}`);
+  }
+  return res.json();
+}
+
+export const api = {
+  medicines: () => get<Medicine[]>("/api/medicines"),
+  articles: () => get<ArticleListItem[]>("/api/articles"),
+  article: (slug: string) => get<Article>(`/api/articles/${slug}`),
+  gallery: () => get<GalleryImage[]>("/api/gallery"),
+};
