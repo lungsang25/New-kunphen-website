@@ -45,6 +45,14 @@ export interface GalleryAlbum {
   updated_at: string;
 }
 
+export interface HeroSlide {
+  id: number;
+  image_url: string;
+  title: string;
+  subtitle: string;
+  sort_order: number;
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`);
   if (!res.ok) {
@@ -58,4 +66,5 @@ export const api = {
   articles: () => get<ArticleListItem[]>("/api/articles"),
   article: (slug: string) => get<Article>(`/api/articles/${slug}`),
   gallery: () => get<GalleryAlbum[]>("/api/gallery"),
+  heroSlides: () => get<HeroSlide[]>("/api/hero-slides"),
 };
