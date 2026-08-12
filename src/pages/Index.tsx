@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { CalendarDays, Pill, BookOpen, Heart, Leaf, Shield } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import SEO from "@/components/SEO";
+import { PAGE_META } from "@/lib/site";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -14,11 +15,7 @@ const fadeUp = {
 const Index = () => {
   return (
     <>
-      <SEO 
-        title="Kunphen Hospital Kathmandu Nepal - Tibetan Medicine & Herbal Clinic"
-        description="Kunphen Hospital in Kathmandu, Nepal - Leading Tibetan Medicine Hospital and Herbal Clinic. Kunphen Medical Center offers authentic Sowa Rigpa treatments, herbal medicines, pulse diagnosis in Kathmandu. Book appointments with experienced Tibetan medicine practitioners in Nepal."
-        keywords="Kunphen Hospital Kathmandu, Kunphen Hospital Nepal, Kunphen Medical Center Kathmandu, Kunphen Herbal Clinic Nepal, Tibetan Medicine Kathmandu, Tibetan Medicine Nepal, Kunphen Kathmandu, Kunphen Nepal, Sowa Rigpa Kathmandu, Traditional Tibetan Medicine Nepal, Herbal Medicine Kathmandu, Pulse Diagnosis Nepal, Holistic Healing Kathmandu, Alternative Medicine Nepal, Tibetan Doctors Kathmandu"
-      />
+      <SEO {...PAGE_META["/"]} />
       <main>
         <HeroSlider />
 

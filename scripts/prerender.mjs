@@ -1,61 +1,57 @@
-// Post-build prerenderer.
+// Post-build prerenderer — static HTML head generation, no browser required.
 //
 // `vite build` emits a single-page app whose routes all resolve to one
-// index.html — so crawlers (and non-JS link unfurlers) see identical markup for
-// every URL, which is why the site earns no sitelinks. This script boots the
-// built app in headless Chrome once per route, waits for React + React Query to
-// finish, and writes the fully-rendered DOM to dist/<route>/index.html. Vercel
-// serves those files directly (filesystem beats the SPA rewrite), so each URL
-// now returns unique, crawlable HTML.
+// index.html, so crawlers and link unfurlers saw identical <head> markup for
+// every URL — same title, same description, and (before the domain fix) the
+// same wrong canonical. That is why the site earned no sitelinks.
 //
-// It also injects per-page JSON-LD (WebSite, SiteNavigationElement, breadcrumbs,
-// and page-type schema) into each snapshot — the structured-data signals that
-// make Google confident enough to grant sitelinks.
+// This script writes a dist/<route>/index.html per route with that route's own
+// title, description, canonical, OG/Twitter tags and JSON-LD baked in. Vercel
+// serves those files directly (filesystem wins over the SPA rewrite), so every
+// URL now returns unique, crawlable HTML. React still hydrates on top and
+// renders the body exactly as before.
 //
-// Run automatically as the second half of `npm run build`.
+// Deliberately browserless: driving headless Chrome during a Vercel build is
+// fragile (no system Chrome, and serverless Chromium builds are pinned to a
+// specific Amazon Linux/glibc generation — the "Failed to launch the browser
+// process: Code 127" class of failure). Everything crawlers need from the head
+// is computable from PAGE_META plus the articles API, so we compute it directly
+// and the build cannot fail that way.
+//
+// Runs as the second step of `npm run build`.
 
-import { createServer } from "node:http";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { existsSync, statSync } from "node:fs";
-import puppeteer from "puppeteer";
-import { SITE_URL, SITE_NAME, NAV_LINKS } from "../src/lib/site.js";
+import { SITE_URL, SITE_NAME, NAV_LINKS, PAGE_META } from "../src/lib/site.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, "..", "dist");
-const PORT = 4319;
 
-// The built app calls this at runtime for its data; we fetch article slugs from
-// the same origin so the snapshot list matches what visitors see. On Vercel this
-// env var is set; locally it falls back to the deployed backend.
 const API_BASE =
   process.env.VITE_API_BASE_URL || "https://kunphen-backend.vercel.app";
 
-const MIME = {
-  ".js": "application/javascript",
-  ".css": "text/css",
-  ".svg": "image/svg+xml",
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".ico": "image/x-icon",
-  ".json": "application/json",
-  ".woff": "font/woff",
-  ".woff2": "font/woff2",
-  ".webp": "image/webp",
-  ".txt": "text/plain",
-  ".xml": "application/xml",
-};
+const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+
+// ---- escaping ---------------------------------------------------------------
+
+const escapeHtml = (s) =>
+  String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+// JSON-LD sits inside <script>; the only sequence that can break out is "</".
+const escapeJsonLd = (json) => json.replace(/</g, "\\u003c");
+
+const ld = (obj) =>
+  `<script type="application/ld+json">${escapeJsonLd(JSON.stringify(obj))}</script>`;
 
 // ---- JSON-LD builders -------------------------------------------------------
 
-function ld(obj) {
-  return `<script type="application/ld+json">${JSON.stringify(obj)}</script>`;
-}
-
-function siteNavigation() {
-  return ld({
+const siteNavigation = () =>
+  ld({
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `${SITE_NAME} navigation`,
@@ -66,21 +62,18 @@ function siteNavigation() {
       url: `${SITE_URL}${l.to === "/" ? "" : l.to}`,
     })),
   });
-}
 
-function website() {
-  return ld({
+const website = () =>
+  ld({
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
     alternateName: ["Kunphen Hospital", "Kunphen Herbal Clinic", "Kunphen"],
     url: SITE_URL,
   });
-}
 
-function breadcrumb(trail) {
-  // trail: [{ name, path }] where path is a route ("" for home).
-  return ld({
+const breadcrumb = (trail) =>
+  ld({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: trail.map((t, i) => ({
@@ -90,10 +83,9 @@ function breadcrumb(trail) {
       item: `${SITE_URL}${t.path}`,
     })),
   });
-}
 
-function articleSchema(a, url) {
-  return ld({
+const articleSchema = (a, url) =>
+  ld({
     "@context": "https://schema.org",
     "@type": "Article",
     headline: a.title,
@@ -109,15 +101,12 @@ function articleSchema(a, url) {
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
   });
-}
 
-// Per-route JSON-LD. Home already carries the Hospital schema statically in
-// index.html, so it only gets the sitewide WebSite + navigation blocks.
+// Home already carries the Hospital schema statically in index.html, so it only
+// adds the sitewide WebSite + navigation blocks.
 function schemaForRoute(route, url) {
   const blocks = [website(), siteNavigation()];
-  if (route.path !== "/") {
-    blocks.push(breadcrumb(route.breadcrumb));
-  }
+  if (route.path !== "/") blocks.push(breadcrumb(route.breadcrumb));
   if (route.type === "medicines") {
     blocks.push(
       ld({
@@ -143,17 +132,95 @@ function schemaForRoute(route, url) {
   return blocks.join("");
 }
 
+// ---- head rewriting ---------------------------------------------------------
+
+// Replace the value of an existing tag when present, otherwise append to <head>.
+function upsert(html, matcher, replacement) {
+  return matcher.test(html)
+    ? html.replace(matcher, replacement)
+    : html.replace("</head>", `    ${replacement}\n  </head>`);
+}
+
+function renderHead(html, route) {
+  const url = `${SITE_URL}${route.path === "/" ? "/" : route.path}`;
+  const title = escapeHtml(route.meta.title);
+  const description = escapeHtml(route.meta.description);
+  const keywords = route.meta.keywords ? escapeHtml(route.meta.keywords) : null;
+  const image = escapeHtml(route.meta.image || OG_IMAGE);
+
+  let out = html;
+  out = out.replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`);
+  out = upsert(
+    out,
+    /<meta name="title" content="[^"]*"\s*\/?>/,
+    `<meta name="title" content="${title}" />`,
+  );
+  out = upsert(
+    out,
+    /<meta name="description" content="[^"]*"\s*\/?>/,
+    `<meta name="description" content="${description}" />`,
+  );
+  if (keywords) {
+    out = upsert(
+      out,
+      /<meta name="keywords" content="[^"]*"\s*\/?>/,
+      `<meta name="keywords" content="${keywords}" />`,
+    );
+  }
+  out = upsert(
+    out,
+    /<link rel="canonical" href="[^"]*"\s*\/?>/,
+    `<link rel="canonical" href="${url}" />`,
+  );
+
+  // Open Graph + Twitter
+  const og = [
+    ["og:url", url],
+    ["og:title", title],
+    ["og:description", description],
+    ["og:image", image],
+  ];
+  for (const [prop, val] of og) {
+    out = upsert(
+      out,
+      new RegExp(`<meta property="${prop}" content="[^"]*"\\s*/?>`),
+      `<meta property="${prop}" content="${val}" />`,
+    );
+  }
+  const tw = [
+    ["twitter:url", url],
+    ["twitter:title", title],
+    ["twitter:description", description],
+    ["twitter:image", image],
+  ];
+  for (const [name, val] of tw) {
+    out = upsert(
+      out,
+      new RegExp(`<meta name="${name}" content="[^"]*"\\s*/?>`),
+      `<meta name="${name}" content="${val}" />`,
+    );
+  }
+
+  // Article pages describe an article, not the site itself.
+  if (route.type === "article") {
+    out = out.replace(
+      /<meta property="og:type" content="[^"]*"\s*\/?>/,
+      `<meta property="og:type" content="article" />`,
+    );
+  }
+
+  return out.replace("</head>", `${schemaForRoute(route, url)}</head>`);
+}
+
 // ---- route list -------------------------------------------------------------
 
-const STATIC_TYPE = {
-  "/medicines": "medicines",
-  "/gallery": "gallery",
-};
+const STATIC_TYPE = { "/medicines": "medicines", "/gallery": "gallery" };
 
 async function buildRoutes() {
   const routes = NAV_LINKS.map((l) => ({
     path: l.to,
     type: STATIC_TYPE[l.to] || "static",
+    meta: PAGE_META[l.to],
     breadcrumb:
       l.to === "/"
         ? [{ name: "Home", path: "/" }]
@@ -163,7 +230,11 @@ async function buildRoutes() {
           ],
   }));
 
-  // Append every published article's detail page.
+  const missing = routes.filter((r) => !r.meta).map((r) => r.path);
+  if (missing.length) {
+    throw new Error(`PAGE_META missing entries for: ${missing.join(", ")}`);
+  }
+
   try {
     const res = await fetch(`${API_BASE}/api/articles`);
     if (res.ok) {
@@ -173,6 +244,11 @@ async function buildRoutes() {
           path: `/articles/${a.slug}`,
           type: "article",
           article: a,
+          meta: {
+            title: `${a.title} - Kunphen Hospital`,
+            description: a.excerpt || "Tibetan medicine article from Kunphen Hospital.",
+            image: a.image_url || OG_IMAGE,
+          },
           breadcrumb: [
             { name: "Home", path: "/" },
             { name: "Articles", path: "/articles" },
@@ -190,116 +266,22 @@ async function buildRoutes() {
   return routes;
 }
 
-// ---- static file server (SPA fallback) --------------------------------------
-
-function startServer(indexHtml) {
-  const server = createServer(async (req, res) => {
-    const urlPath = decodeURIComponent(req.url.split("?")[0]);
-    const filePath = join(DIST, urlPath);
-    // Serve real asset files; everything else falls back to index.html so the
-    // SPA router can render the requested route.
-    if (urlPath !== "/" && existsSync(filePath) && statSync(filePath).isFile()) {
-      const ext = urlPath.slice(urlPath.lastIndexOf("."));
-      try {
-        const body = await readFile(filePath);
-        res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
-        res.end(body);
-        return;
-      } catch {
-        /* fall through */
-      }
-    }
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.end(indexHtml);
-  });
-  return new Promise((resolve) => server.listen(PORT, () => resolve(server)));
-}
-
 // ---- main -------------------------------------------------------------------
 
 async function prerender() {
   console.log("Prerendering routes:");
   const indexHtml = await readFile(join(DIST, "index.html"), "utf8");
   const routes = await buildRoutes();
-  const server = await startServer(indexHtml);
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-
-  let ok = 0;
   for (const route of routes) {
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-    page.on("request", async (r) => {
-      const type = r.resourceType();
-      // Abort heavy sub-resources: the <img>/font tags stay in the DOM (which is
-      // all crawlers need) but the network goes idle fast and reliably.
-      if (["image", "media", "font"].includes(type)) {
-        r.abort();
-        return;
-      }
-      // The backend's CORS only allows the production origin, so a fetch from
-      // this headless page (localhost origin) would be blocked and the data
-      // pages would render empty. Fulfil API calls ourselves — server-to-server
-      // fetch has no CORS — and hand the browser a permissive response so React
-      // Query gets real data. Same behaviour whether this runs locally or on CI.
-      if (r.url().startsWith(API_BASE)) {
-        try {
-          const upstream = await fetch(r.url(), { headers: { accept: "application/json" } });
-          const body = Buffer.from(await upstream.arrayBuffer());
-          r.respond({
-            status: upstream.status,
-            headers: {
-              "content-type": upstream.headers.get("content-type") || "application/json",
-              "access-control-allow-origin": "*",
-            },
-            body,
-          });
-        } catch (err) {
-          r.abort();
-        }
-        return;
-      }
-      r.continue();
-    });
-
-    const url = `${SITE_URL}${route.path === "/" ? "/" : route.path}`;
-    try {
-      await page.goto(`http://localhost:${PORT}${route.path}`, {
-        waitUntil: "networkidle0",
-        timeout: 30000,
-      });
-      // Data-loaded signal: a non-empty <h1> exists.
-      await page.waitForFunction(
-        () => {
-          const h = document.querySelector("h1");
-          return h && h.textContent.trim().length > 0;
-        },
-        { timeout: 15000 },
-      );
-
-      let html = await page.content();
-      html = html.replace("</head>", `${schemaForRoute(route, url)}</head>`);
-
-      const outDir =
-        route.path === "/" ? DIST : join(DIST, route.path);
-      await mkdir(outDir, { recursive: true });
-      await writeFile(join(outDir, "index.html"), html, "utf8");
-      console.log(`  ✓ ${route.path}`);
-      ok++;
-    } catch (err) {
-      console.error(`  ✗ ${route.path} — ${err.message}`);
-    } finally {
-      await page.close();
-    }
+    const html = renderHead(indexHtml, route);
+    const outDir = route.path === "/" ? DIST : join(DIST, route.path);
+    await mkdir(outDir, { recursive: true });
+    await writeFile(join(outDir, "index.html"), html, "utf8");
+    console.log(`  ✓ ${route.path}`);
   }
 
-  await browser.close();
-  server.close();
-  console.log(`Prerendered ${ok}/${routes.length} routes.`);
-  if (ok < routes.length) process.exitCode = 1;
+  console.log(`Prerendered ${routes.length} routes.`);
 }
 
 prerender().catch((err) => {

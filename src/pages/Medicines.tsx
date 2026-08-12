@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, ShoppingBag, X } from "lucide-react";
 import SEO from "@/components/SEO";
+import { PAGE_META } from "@/lib/site";
 import { api, type Medicine } from "@/lib/api";
 
 const fadeUp = {
@@ -21,11 +22,7 @@ const Medicines = () => {
 
   return (
     <>
-      <SEO 
-        title="Tibetan Herbal Medicines Kathmandu Nepal - Kunphen Herbal Clinic"
-        description="Explore authentic Tibetan herbal medicines at Kunphen Herbal Clinic in Kathmandu, Nepal. Discover traditional remedies like Agar-35, Rinchen Ratna Sampel at Kunphen Medical Center. Natural formulations for holistic healing in Nepal."
-        keywords="Tibetan herbal medicine Kathmandu, Tibetan herbal medicine Nepal, Agar-35 Kathmandu, Kunphen Herbal Clinic Nepal, traditional remedies Kathmandu, Himalayan herbs Nepal, natural medicine Kathmandu, Tibetan pills Nepal, herbal formulations Kathmandu, Kunphen medicines Nepal"
-      />
+      <SEO {...PAGE_META["/medicines"]} />
     <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-5xl">

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
+import { PAGE_META } from "@/lib/site";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -33,11 +34,7 @@ const Appointments = () => {
 
   return (
     <>
-      <SEO 
-        title="Book Appointment Kathmandu Nepal - Kunphen Hospital Tibetan Medicine"
-        description="Schedule your consultation at Kunphen Hospital in Kathmandu, Nepal. Book appointments with expert Tibetan medicine practitioners at Kunphen Medical Center for pulse diagnosis, herbal medicine treatment, and holistic wellness care in Kathmandu."
-        keywords="book appointment Kunphen Kathmandu, book appointment Kunphen Nepal, Tibetan medicine consultation Kathmandu, schedule appointment Nepal, pulse diagnosis booking Kathmandu, herbal medicine appointment Nepal, holistic health consultation Kathmandu, Kunphen Medical Center appointment"
-      />
+      <SEO {...PAGE_META["/appointments"]} />
     <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-6xl">

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import SEO from "@/components/SEO";
+import { PAGE_META } from "@/lib/site";
 import { api } from "@/lib/api";
 
 const fadeUp = {
@@ -38,11 +39,7 @@ const Articles = () => {
 
   return (
     <>
-      <SEO 
-        title="Tibetan Medicine Articles & Blog - Kunphen Hospital Wellness Resources"
-        description="Read informative articles about Tibetan medicine, Sowa Rigpa philosophy, herbal remedies, and holistic wellness from Kunphen Hospital's expert practitioners."
-        keywords="Tibetan medicine articles, Sowa Rigpa blog, herbal medicine information, holistic wellness articles, traditional medicine resources, Kunphen blog"
-      />
+      <SEO {...PAGE_META["/articles"]} />
       <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-5xl">

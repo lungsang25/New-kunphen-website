@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import SEO from "@/components/SEO";
+import { PAGE_META } from "@/lib/site";
 
 const DESCRIPTION_TRUNCATE_LENGTH = 180;
 
@@ -145,11 +146,7 @@ function PractitionerCard({
 const About = () => {
   return (
     <>
-      <SEO 
-        title="About Kunphen Hospital Kathmandu Nepal - Expert Tibetan Medicine Practitioners"
-        description="Meet our experienced Tibetan medicine doctors at Kunphen Hospital in Kathmandu, Nepal. Learn about our founder Dr. Kunsang Phenthok and our team of expert healers at Kunphen Medical Center specializing in Sowa Rigpa and traditional Tibetan medicine in Nepal."
-        keywords="Kunphen doctors Kathmandu, Tibetan medicine practitioners Nepal, Dr. Kunsang Phenthok, Sowa Rigpa healers Kathmandu, traditional medicine experts Nepal, Tibetan physicians Kathmandu, holistic healers Nepal, Kunphen Medical Center doctors"
-      />
+      <SEO {...PAGE_META["/about"]} />
       <main className="pt-20">
       {/* Hero */}
       <section className="section-padding bg-card">

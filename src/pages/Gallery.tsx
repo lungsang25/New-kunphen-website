@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Images } from "lucide-react";
 import SEO from "@/components/SEO";
+import { PAGE_META } from "@/lib/site";
 import { api } from "@/lib/api";
 
 const fadeUp = {
@@ -64,11 +65,7 @@ const Gallery = () => {
 
   return (
     <>
-      <SEO
-        title="Gallery - Kunphen Hospital Facilities & Traditional Medicine Photos"
-        description="View photos of Kunphen Tibetan Medicine Hospital, our practitioners, herbal medicine preparations, facilities, and traditional healing practices."
-        keywords="Kunphen gallery, Tibetan medicine photos, hospital facilities, traditional medicine images, herbal preparation, Kunphen hospital photos"
-      />
+      <SEO {...PAGE_META["/gallery"]} />
       <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-6xl">
