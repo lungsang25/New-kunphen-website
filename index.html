@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+
     <!-- Primary Meta Tags -->
     <title>Kunphen Hospital Kathmandu Nepal - Tibetan Medicine & Herbal Clinic</title>
     <meta name="title" content="Kunphen Hospital Kathmandu Nepal - Tibetan Medicine & Herbal Clinic" />
@@ -43,8 +45,8 @@
       "@context": "https://schema.org",
       "@type": "Hospital",
       "@id": "https://www.kunphenherbalclinic.com",
-      "name": "Kunphen Hospital Kathmandu Nepal - Tibetan Medicine & Herbal Clinic",
-      "alternateName": ["Kunphen Hospital", "Kunphen Medical Center", "Kunphen Herbal Clinic", "Kunphen Hospital Kathmandu", "Kunphen Hospital Nepal"],
+      "name": "Kunphen Tibetan Medical Centre",
+      "alternateName": ["Kunphen Tibetan Medical Center", "Kunphen Hospital", "Kunphen Medical Center", "Kunphen Herbal Clinic", "Kunphen Hospital Kathmandu", "Kunphen Hospital Nepal"],
       "url": "https://www.kunphenherbalclinic.com",
       "logo": "https://www.kunphenherbalclinic.com/logo.png",
       "description": "Kunphen Hospital in Kathmandu, Nepal specializes in traditional Tibetan medicine and Sowa Rigpa healing. Leading herbal clinic and medical center offering authentic Tibetan treatments, herbal remedies, pulse diagnosis, and holistic wellness care in Kathmandu, Nepal.",
@@ -60,6 +62,11 @@
       },
       "telephone": "+977-1-5351920",
       "email": "info@kunphen.com",
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 27.7172,
+        "longitude": 85.3240
+      },
       "openingHoursSpecification": [
         {
           "@type": "OpeningHoursSpecification",
@@ -69,7 +76,9 @@
         }
       ],
       "sameAs": [
-        "https://www.kunphenherbalclinic.com"
+        "https://np.linkedin.com/in/kunphen-center-831856100",
+        "https://www.facebook.com/Tibetanmedicinekunphen/",
+        "https://www.instagram.com/kunphentibetanmedical/"
       ],
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
@@ -101,21 +110,8 @@
     }
     </script>
 
-    <!-- Breadcrumb Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.kunphenherbalclinic.com/"
-        }
-      ]
-    }
-    </script>
+    <!-- Per-page BreadcrumbList / WebSite / navigation JSON-LD are injected at
+         build time by scripts/prerender.mjs so each route gets its own trail. -->
   </head>
 
   <body>

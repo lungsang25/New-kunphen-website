@@ -2,15 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const links = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/medicines", label: "Medicines" },
-  { to: "/articles", label: "Articles" },
-  { to: "/gallery", label: "Gallery" },
-  { to: "/appointments", label: "Appointments" },
-];
+import { NAV_LINKS as links } from "@/lib/site";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
