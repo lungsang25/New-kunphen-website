@@ -149,7 +149,7 @@ const About = () => {
       <SEO {...PAGE_META["/about"]} />
       <main className="pt-20">
       {/* Hero */}
-      <section className="section-padding bg-card">
+      <section className="section-padding bg-card pb-8 md:pb-10">
         <div className="container mx-auto max-w-4xl text-center">
           <motion.div {...fadeUp}>
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -165,67 +165,14 @@ const About = () => {
         </div>
       </section>
 
-      {/* Mission */}
-      <section className="section-padding">
-        <div className="container mx-auto max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div {...fadeUp}>
-              <h2 className="font-display text-3xl font-bold text-foreground mb-4">
-                Our Mission & Heritage
-              </h2>
-              <div className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  Tibetan medicine, or <em>Sowa Rigpa</em>, is one of the world's oldest and most
-                  complete medical systems. It originated over 2,500 years ago and is built upon the
-                  Buddhist understanding of the interdependence of body, mind, and spirit.
-                </p>
-                <p>
-                  At Kunphen, we honor this lineage through authentic practice. Our physicians are
-                  trained in the four medical tantras (<em>rGyud-bzhi</em>), mastering pulse diagnosis,
-                  urine analysis, and the preparation of herbal compounds from Himalayan botanicals.
-                </p>
-                <p>
-                  We believe that true healing addresses the root cause of disease—not merely its
-                  symptoms. Through personalized treatments that may include herbal medicine, dietary
-                  guidance, moxibustion, and spiritual counseling, we guide each patient toward
-                  lasting balance and wellness.
-                </p>
-              </div>
-            </motion.div>
-            <motion.div
-              {...fadeUp}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-card rounded-lg p-8 border border-border"
-            >
-              <h3 className="font-display text-xl font-semibold text-foreground mb-4">
-                The Five Elements
-              </h3>
-              <p className="text-muted-foreground text-sm mb-6">
-                Tibetan medicine views health through the balance of five elements:
-              </p>
-              <div className="space-y-3">
-                {["Earth — Stability & Structure", "Water — Cohesion & Fluidity", "Fire — Transformation & Warmth", "Wind — Movement & Energy", "Space — Openness & Potential"].map(
-                  (el) => (
-                    <div key={el} className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0" />
-                      <span className="text-sm text-foreground">{el}</span>
-                    </div>
-                  )
-                )}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
       {/* Doctors */}
-      <section className="section-padding bg-card">
+      <section className="section-padding bg-card pt-4 md:pt-6">
         <div className="container mx-auto max-w-5xl">
-          <motion.div {...fadeUp} className="text-center mb-12">
+          <motion.div {...fadeUp} className="text-left mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
               Our Practitioners
             </h2>
-            <div className="tibetan-divider" />
+            <div className="tibetan-divider !mx-0" />
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
