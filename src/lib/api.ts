@@ -8,6 +8,11 @@ export interface Medicine {
   full_description: string;
   image_url: string;
   uses: string[];
+  category: string;
+  price: number;
+  in_stock: boolean;
+  dosage: string;
+  notes: string;
   created_at: string;
   updated_at: string;
 }
@@ -17,6 +22,7 @@ export interface ArticleListItem {
   title: string;
   slug: string;
   category: string;
+  author: string;
   excerpt: string;
   image_url: string;
   published_at: string;
@@ -63,6 +69,7 @@ async function get<T>(path: string): Promise<T> {
 
 export const api = {
   medicines: () => get<Medicine[]>("/api/medicines"),
+  medicine: (id: number | string) => get<Medicine>(`/api/medicines/${id}`),
   articles: () => get<ArticleListItem[]>("/api/articles"),
   article: (slug: string) => get<Article>(`/api/articles/${slug}`),
   gallery: () => get<GalleryAlbum[]>("/api/gallery"),

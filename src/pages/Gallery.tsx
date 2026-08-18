@@ -69,12 +69,12 @@ const Gallery = () => {
       <main className="pt-20">
       <section className="section-padding">
         <div className="container mx-auto max-w-6xl">
-          <motion.div {...fadeUp} className="text-center mb-12">
+          <motion.div {...fadeUp} className="mb-12">
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
               Gallery
             </h1>
-            <div className="tibetan-divider mb-6" />
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <div className="tibetan-divider !mx-0 mb-6" />
+            <p className="text-muted-foreground max-w-2xl">
               Glimpses of life at Kunphen — our healing activities, community events, and the beauty of Tibetan medicine in practice.
             </p>
           </motion.div>

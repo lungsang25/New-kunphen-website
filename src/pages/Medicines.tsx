@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { Phone, ShoppingBag, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { Search } from "lucide-react";
 import SEO from "@/components/SEO";
 import { PAGE_META } from "@/lib/site";
-import { api, type Medicine } from "@/lib/api";
+import { api } from "@/lib/api";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -13,140 +14,137 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
+const CATEGORIES = [
+  "All",
+  "Mental well-being",
+  "Joints & mobility",
+  "Circulation",
+  "Digestive",
+  "Respiratory",
+];
+
 const Medicines = () => {
-  const [selected, setSelected] = useState<Medicine | null>(null);
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
   const { data: medicines = [], isLoading, isError } = useQuery({
     queryKey: ["medicines"],
     queryFn: api.medicines,
   });
 
+  const filtered = medicines.filter((med) => {
+    const matchCategory = activeCategory === "All" || med.category === activeCategory;
+    const q = search.toLowerCase();
+    const matchSearch =
+      med.name.toLowerCase().includes(q) || med.description.toLowerCase().includes(q);
+    return matchCategory && matchSearch;
+  });
+
   return (
     <>
       <SEO {...PAGE_META["/medicines"]} />
-    <main className="pt-20">
-      <section className="section-padding">
-        <div className="container mx-auto max-w-5xl">
-          <motion.div {...fadeUp} className="text-center mb-12">
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Our Medicines
-            </h1>
-            <div className="tibetan-divider mb-6" />
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Traditional Tibetan herbal formulations, prepared with authentic Himalayan ingredients
-              following centuries-old recipes from the medical tantras.
-            </p>
-          </motion.div>
-
-          {isLoading && (
-            <p className="text-center text-muted-foreground">Loading medicines…</p>
-          )}
-          {isError && (
-            <p className="text-center text-muted-foreground">Unable to load medicines right now.</p>
-          )}
-          {!isLoading && !isError && medicines.length === 0 && (
-            <p className="text-center text-muted-foreground">No medicines available yet.</p>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {medicines.map((med, i) => (
-              <motion.div
-                key={med.id}
-                {...fadeUp}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                onClick={() => setSelected(med)}
-                className="cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow group"
-              >
-                <div className="aspect-video overflow-hidden">
-                  <img
-                    src={med.image_url}
-                    alt={med.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <p className="text-accent text-xs mb-1 font-body">{med.tibetan_name}</p>
-                  <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                    {med.name}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">{med.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Medicine Detail Modal */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/50 backdrop-blur-sm"
-            onClick={() => setSelected(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-background rounded-lg max-w-lg w-full max-h-[80vh] overflow-y-auto border border-border"
-            >
-              <div className="relative">
-                <img
-                  src={selected.image_url}
-                  alt={selected.name}
-                  className="w-full aspect-video object-cover rounded-t-lg"
-                />
-                <button
-                  onClick={() => setSelected(null)}
-                  className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full p-1.5"
-                  aria-label="Close"
-                >
-                  <X className="w-5 h-5 text-foreground" />
-                </button>
-              </div>
-              <div className="p-6">
-                <p className="text-accent text-sm mb-1">{selected.tibetan_name}</p>
-                <h2 className="font-display text-2xl font-bold text-foreground mb-3">
-                  {selected.name}
-                </h2>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {selected.full_description}
-                </p>
-                <div className="mb-6">
-                  <h4 className="font-display text-sm font-semibold text-foreground mb-2">Common Uses:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selected.uses.map((u) => (
-                      <span key={u} className="bg-secondary text-secondary-foreground text-xs px-3 py-1 rounded-full">
-                        {u}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <a
-                    href="mailto:info@kunphen.com?subject=Order Inquiry"
-                    className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-md text-sm font-medium hover:bg-maroon-dark transition-colors"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    Buy Now
-                  </a>
-                  <a
-                    href="tel:+97715351920"
-                    className="flex-1 flex items-center justify-center gap-2 bg-secondary text-secondary-foreground py-2.5 rounded-md text-sm font-medium hover:bg-muted transition-colors"
-                  >
-                    <Phone className="w-4 h-4" />
-                    Call to Order
-                  </a>
-                </div>
-              </div>
+      <main className="pt-20">
+        <section className="section-padding">
+          <div className="container mx-auto max-w-5xl">
+            <motion.div {...fadeUp} className="mb-12">
+              <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+                Our Medicines
+              </h1>
+              <div className="w-24 h-0.5 bg-accent mb-6" />
+              <p className="text-muted-foreground max-w-2xl">
+                Traditional Tibetan herbal formulations, prepared with authentic Himalayan ingredients
+                following centuries-old recipes from the medical tantras.
+              </p>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </main>
+
+            {/* Search & Filters */}
+            <div className="mb-8 flex flex-col md:flex-row md:items-center gap-4">
+              <div className="relative w-full md:w-72 shrink-0">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search by name or use"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      activeCategory === cat
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {isLoading && (
+              <p className="text-center text-muted-foreground">Loading medicines…</p>
+            )}
+            {isError && (
+              <p className="text-center text-muted-foreground">Unable to load medicines right now.</p>
+            )}
+            {!isLoading && !isError && medicines.length === 0 && (
+              <p className="text-center text-muted-foreground">No medicines available yet.</p>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((med, i) => (
+                <motion.div
+                  key={med.id}
+                  {...fadeUp}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                >
+                  <Link
+                    to={`/medicines/${med.id}`}
+                    className="block bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow group"
+                  >
+                    <div className="aspect-video overflow-hidden">
+                      <img
+                        src={med.image_url}
+                        alt={med.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h3 className="font-display text-xl font-semibold text-foreground">
+                          {med.name}
+                        </h3>
+                        <span className="shrink-0 text-xs px-2.5 py-0.5 rounded-full border border-border text-foreground">
+                          {med.in_stock ? "In stock" : "Out of stock"}
+                        </span>
+                      </div>
+                      {med.category && (
+                        <p className="text-accent text-xs mb-2 font-medium tracking-wide uppercase">
+                          {med.category}
+                        </p>
+                      )}
+                      <p className="text-muted-foreground text-sm mb-4">{med.description}</p>
+                      {med.price > 0 && (
+                        <p className="text-foreground font-semibold">€{med.price.toFixed(2)}</p>
+                      )}
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            {!isLoading && !isError && medicines.length > 0 && filtered.length === 0 && (
+              <p className="text-center text-muted-foreground mt-12">
+                No medicines found matching your search.
+              </p>
+            )}
+          </div>
+        </section>
+      </main>
     </>
   );
 };

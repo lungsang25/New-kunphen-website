@@ -42,38 +42,39 @@ const Articles = () => {
       <SEO {...PAGE_META["/articles"]} />
       <main className="pt-20">
       <section className="section-padding">
-        <div className="container mx-auto max-w-5xl">
-          <motion.div {...fadeUp} className="text-center mb-12">
+        <div className="container mx-auto max-w-6xl">
+          <motion.div {...fadeUp} className="mb-8">
             <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Articles & Insights
+              Articles from the clinic
             </h1>
-            <div className="tibetan-divider mb-6" />
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Explore the wisdom of Tibetan medicine through our articles on healing, wellness, and ancient practices.
+            <p className="text-muted-foreground max-w-2xl">
+              Writing on Tibetan medical theory, diagnosis, diet and daily practice — written by the practitioners at Kunphen.
             </p>
           </motion.div>
 
+          <div className="border-t border-border mb-8" />
+
           {/* Search & Filters */}
-          <div className="mb-8 space-y-4">
-            <div className="relative max-w-md mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-10">
+            <div className="relative w-full md:w-72 shrink-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search articles..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                     activeCategory === cat
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-muted-foreground hover:bg-secondary"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card text-foreground border-border hover:bg-secondary"
                   }`}
                 >
                   {cat}
@@ -90,36 +91,35 @@ const Articles = () => {
           )}
 
           {/* Articles Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {filtered.map((article, i) => (
               <motion.article
                 key={article.id}
                 {...fadeUp}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow group cursor-pointer"
+                className="group cursor-pointer"
               >
                 <Link to={`/articles/${article.slug}`}>
-                  <div className="aspect-video overflow-hidden">
+                  <div className="rounded-xl overflow-hidden mb-4 aspect-[4/3]">
                     <img
                       src={article.image_url}
                       alt={article.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="bg-accent/15 text-accent text-xs px-2.5 py-0.5 rounded-full font-medium">
-                        {article.category}
-                      </span>
-                      <span className="text-muted-foreground text-xs">{formatDate(article.published_at)}</span>
-                    </div>
-                    <h3 className="font-display text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                      {article.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {article.excerpt}
-                    </p>
-                  </div>
+                  <span className="text-xs font-semibold tracking-wide uppercase text-primary">
+                    {article.category}
+                  </span>
+                  <h3 className="font-display text-xl font-semibold text-foreground mt-1 mb-2 group-hover:text-primary transition-colors">
+                    {article.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">
+                    {article.excerpt}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {article.author && `${article.author} · `}
+                    {formatDate(article.published_at)}
+                  </p>
                 </Link>
               </motion.article>
             ))}

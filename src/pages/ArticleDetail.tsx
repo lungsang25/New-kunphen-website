@@ -58,6 +58,7 @@ const ArticleDetail = () => {
                     {article.category}
                   </span>
                   <span className="text-muted-foreground text-xs">
+                    {article.author && `${article.author} · `}
                     {formatDate(article.published_at)}
                   </span>
                 </div>
