@@ -14,6 +14,7 @@ import Gallery from "./pages/Gallery";
 import Appointments from "./pages/Appointments";
 import NotFound from "./pages/NotFound";
 import AIAssistantChat from "./components/AIAssistantChat";
+import Analytics from "./components/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <Analytics />
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
