@@ -6,7 +6,7 @@ dotenv.config();
 
 const app = express();
 const port = Number(process.env.AI_SERVER_PORT || 8787);
-const model = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
+const model = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 const groqApiKey = process.env.GROQ_API_KEY;
 
 if (!groqApiKey) {

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const model = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
+const model = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 const groqApiKey = process.env.GROQ_API_KEY;
 
 const systemPrompt = `
